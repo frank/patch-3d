@@ -1,0 +1,106 @@
+[project]
+name = "patch-pipeline-3d"
+description = "Pipeline for image volume resampling, patch iteration, and merging."
+readme = "README.md"
+requires-python = ">=3.12"
+dynamic = ["version"]
+dependencies = [
+    "numpy>=1.26",
+    "SimpleITK>=2.3.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/patch_pipeline/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/patch_pipeline"]
+
+[dependency-groups]
+test = [
+    "pytest>=8.0",
+    "scipy>=1.11.2",  # independent reference implementation
+]
+lint = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+dev = [
+    "poethepoet>=0.48",
+    { include-group = "test" },
+    { include-group = "lint" },
+]
+
+[tool.poe.tasks.format]
+help = "Rewrite files to satisfy the formatter and the fixable lint rules"
+sequence = [
+    { cmd = "ruff format ." },
+    { cmd = "ruff check --fix ." },
+]
+
+[tool.poe.tasks.lint]
+help = "Check formatting and lint rules without modifying files"
+sequence = [
+    { cmd = "ruff format --check ." },
+    { cmd = "ruff check ." },
+]
+
+[tool.poe.tasks.typecheck]
+help = "Run mypy over src and tests"
+cmd = "mypy"
+
+[tool.poe.tasks.test]
+help = "Run the test suite, excluding benchmarks"
+cmd = "pytest"
+
+[tool.poe.tasks.benchmark]
+help = "Run only the opt-in benchmark tests"
+cmd = "pytest -m benchmark"
+
+[tool.poe.tasks.gate]
+help = "Everything that must pass before a commit is acceptable"
+sequence = [
+    { ref = "lint" },
+    { ref = "typecheck" },
+    { ref = "test" },
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config", "--import-mode=importlib", "-m", "not benchmark"]
+markers = ["benchmark: slow, realistic-volume timing runs; opt in with `-m benchmark`"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = [
+    "F",    # pyflakes
+    "E",    # pycodestyle
+    "W",    # pycodestyle warnings
+    "I",    # import sorting
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "SIM",  # simplify
+    "ANN",  # annotations on arguments and return types
+    "RUF",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN"]
+
+[tool.mypy]
+files = ["src", "tests"]
+strict = true
+untyped_calls_exclude = ["SimpleITK"]  # ships py.typed, but its SWIG functions are unannotated
+
+[[tool.mypy.overrides]]
+module = ["scipy.*"]  # test-only reference implementation, without stubs
+ignore_missing_imports = true
