@@ -1,5 +1,5 @@
 [project]
-name = "patch-pipeline-3d"
+name = "patch-3d"
 description = "Pipeline for image volume resampling, patch iteration, and merging."
 readme = "README.md"
 requires-python = ">=3.12"

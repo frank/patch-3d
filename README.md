@@ -1,4 +1,4 @@
-# patch-pipeline-3d
+# patch-3d
 
 Patch-based inference on 3D volumes, with resampling in both directions. `PatchPipeline`:
 
@@ -21,9 +21,9 @@ high-resolution patch over a region found by a coarse pass, as described in
 Install this package with:
 
 ```sh
-pip install git+https://github.com/frank/patch-pipeline-3d.git
+pip install git+https://github.com/frank/patch-3d.git
 # or, in a uv project
-uv add git+https://github.com/frank/patch-pipeline-3d.git
+uv add git+https://github.com/frank/patch-3d.git
 ```
 
 Append `@<tag or commit>` to the URL to pin a version.

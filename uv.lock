@@ -344,7 +344,7 @@ wheels = [
 ]
 
 [[package]]
-name = "patch-pipeline-3d"
+name = "patch-3d"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
